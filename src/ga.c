@@ -1,3 +1,4 @@
+#include <float.h>
 #include "gorilla/ga.h"
 #include "gorilla/ga_internal.h"
 
@@ -534,8 +535,8 @@ void gaX_handle_init(ga_Handle* in_handle, ga_Mixer* in_mixer)
   h->gain = 1.0f;
   h->pitch = 1.0f;
   h->pan = 0.0f;
-  h->lastPan = 0;
-  h->lastGain = 1;
+  h->lastPan = FLT_MAX;
+  h->lastGain = FLT_MAX;
   h->handleMutex = gc_mutex_create();
 }
 
@@ -839,6 +840,8 @@ void gaX_mixer_mix_handle(ga_Mixer* in_mixer, ga_Handle* in_handle, gc_int32 in_
           pitch = h->pitch;
 	  lastPan = h->lastPan;
 	  lastGain = h->lastGain;
+	  if(lastPan == FLT_MAX) { lastPan = pan; }
+	  if(lastGain == FLT_MAX) { lastGain = gain; }
 	  h->lastPan = pan;
 	  h->lastGain = gain;
           gc_mutex_unlock(h->handleMutex);
